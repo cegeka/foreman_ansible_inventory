@@ -16,7 +16,7 @@ catalog_hash = JSON.parse(File.read(options[:facts_file]))
 
 def write_inventory(catalog_hash,fact,fact_value,file)
     catalog_hash.each { |key,value|
-        if value.has_key?(fact) and value["customerappl"] == fact_value
+        if value.has_key?(fact) and value[fact] == fact_value
             file.write(key + "\n")
         end
     }
