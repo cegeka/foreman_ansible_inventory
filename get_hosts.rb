@@ -13,25 +13,40 @@ OptionParser.new do |opts|
 end.parse!
 
 catalog_hash = JSON.parse(File.read(options[:facts_file]))
-
 def write_inventory(catalog_hash,facts_list,facts_values,file)
-    catalog_hash.each { |key,value|
-      facts_values.each { |fact_val|
-      test=true
-      facts_list.each_index { |x|
-        #does not have key
-        if ! value.has_key?(facts_list[x])
-          test=false
-        #diferent value for key
-        elsif ! ( value[facts_list[x]] == fact_val[x] )
-          test=false
+# with duplicates
+    if facts_values[0].instance_of?(Array)
+      catalog_hash.each { |key,value|
+        facts_values.each { |fact_val|
+        test=true
+        facts_list.each_index { |x|
+          #does not have key
+          if ! value.has_key?(facts_list[x])
+            test=false
+          #diferent value for key
+          elsif ! ( value[facts_list[x]] == fact_val[x] )
+            test=false
+          end
+        }
+        if test == true
+          file.write(key + "\n")
+        end
+        }
+      }
+    else
+#without duplicates
+      catalog_hash.each { |key,value|
+        test =true
+        facts_values.each { |fact_val|
+          if ! ( value[facts_list[facts_values.index(fact_val)]] == fact_val )
+            test=false
+          end
+        }
+        if test == true
+          file.write(key + "\n")
         end
       }
-      if test == true
-        file.write(key + "\n")
-      end
-      }
-    }
+    end
 end
 
 facts_list=options[:facts_list].delete(' ').split(",")
