@@ -34,8 +34,8 @@ def write_inventory(catalog_hash,facts_list,facts_values,file)
     }
 end
 
-facts_list=options[:facts_list].split(",")
-facts_values=options[:facts_values].split(",")
+facts_list=options[:facts_list].delete(' ').split(",")
+facts_values=options[:facts_values].delete(' ').split(",")
 
 if facts_list.length != facts_values.length
     abort("Every fact has to have a correspondent value")
