@@ -16,14 +16,13 @@ catalog_hash = JSON.parse(File.read(options[:facts_file]))
 
 def write_inventory(catalog_hash,facts_list,facts_values,file)
     catalog_hash.each { |key,value|
-      facts_values.each { |fact_val|
       test=true
       facts_list.each_index { |x|
         #does not have key
         if ! value.has_key?(facts_list[x])
           test=false
         #diferent value for key
-        elsif ! ( value[facts_list[x]] == fact_val[x] )
+        elsif ! ( value[facts_list[x]] == facts_values[x] )
           test=false
         end
       }
@@ -31,7 +30,6 @@ def write_inventory(catalog_hash,facts_list,facts_values,file)
         file.write(key + "\n")
       end
       }
-    }
 end
 
 facts_list=options[:facts_list].delete(' ').split(",")
