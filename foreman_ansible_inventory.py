@@ -165,6 +165,38 @@ class ForemanInventory(object):
             self.session.verify = self.foreman_ssl_verify
         return self.session
 
+   def merge_hashes(self,source, destination):
+       for key, value in source.items():
+           if isinstance(value, dict):
+               # get node or create one
+               node = destination.setdefault(key, {})
+               self.merge_hashes(value, node)
+           else:
+               destination[key] = value
+       return destination
+
+    def _get_json_facts(self, url, ignore_errors=None):
+        page = 1
+        results = {}
+        s = self._get_session()
+        while True:
+            ret = s.get(url, params={'page': page, 'per_page': 250})
+            if ignore_errors and ret.status_code in ignore_errors:
+                break
+            ret.raise_for_status()
+            json = ret.json()
+            # /hosts/:id has not results key
+            if 'results' not in json:
+                return json
+            # Facts are returned as dict in results not list
+            if isinstance(json['results'], dict):
+                self.merge_hashes(json['results'],results)
+            # List of all hosts is returned paginaged
+            page += 1
+            if len(json['results']) == 0:
+                break
+        return results
+
     def _get_json(self, url, ignore_errors=None, params=None):
         if params is None:
             params = {}
@@ -209,7 +241,7 @@ class ForemanInventory(object):
 
     def _get_host_data_by_id(self, hid):
         url = "%s/api/v2/hosts/%s" % (self.foreman_url, hid)
-        return self._get_json(url)
+        return self._get_json_facts(url)
 
     def _get_facts_by_id(self, hid):
         url = "%s/api/v2/hosts/%s/facts" % (self.foreman_url, hid)
