@@ -241,11 +241,11 @@ class ForemanInventory(object):
 
     def _get_host_data_by_id(self, hid):
         url = "%s/api/v2/hosts/%s" % (self.foreman_url, hid)
-        return self._get_json_facts(url)
+        return self._get_json(url)
 
     def _get_facts_by_id(self, hid):
         url = "%s/api/v2/hosts/%s/facts" % (self.foreman_url, hid)
-        return self._get_json(url)
+        return self._get_json_facts(url)
 
     def _resolve_params(self, host_params):
         """Convert host params to dict"""
