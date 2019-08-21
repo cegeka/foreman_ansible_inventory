@@ -165,15 +165,15 @@ class ForemanInventory(object):
             self.session.verify = self.foreman_ssl_verify
         return self.session
 
-   def merge_hashes(self,source, destination):
-       for key, value in source.items():
-           if isinstance(value, dict):
-               # get node or create one
-               node = destination.setdefault(key, {})
-               self.merge_hashes(value, node)
-           else:
-               destination[key] = value
-       return destination
+    def merge_hashes(self,source, destination):
+        for key, value in source.items():
+            if isinstance(value, dict):
+                # get node or create one
+                node = destination.setdefault(key, {})
+                self.merge_hashes(value, node)
+            else:
+                destination[key] = value
+        return destination
 
     def _get_json_facts(self, url, ignore_errors=None):
         page = 1
